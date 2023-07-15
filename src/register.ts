@@ -1,20 +1,21 @@
-/// <reference lib="deno.unstable" />
-
 import { User } from "../types.d.ts";
+import * as bcrypt from "bcrypt";
+import session, { createSession } from "./session.ts";
+import { createTokens } from "./token.ts";
 
 const kv = await Deno.openKv();
+
+export default { register };
 
 export async function register(username: string, password: string) {
     const userExists = await doesUsernameExist(username);
 
     if (!userExists) throw new Error('Username already exists');
 
-    await createUser(username, password);
-    // check if username exists
-        // return error if exists
-    // save new user
-    // create session
-    // return jwts for accessTooken and refreshToken
+    const userid = await createUser(username, password);
+    const sessionToken = await createSession(userid);
+
+    return createTokens(sessionToken.uuid, userid);
 }
 
 async function doesUsernameExist(username: string) {
@@ -25,16 +26,19 @@ async function doesUsernameExist(username: string) {
 
 async function createUser(username: string, password: string) {
     const a = await kv.atomic();
-    const id = "000";
+    const uuid = crypto.randomUUID();
+    const hash = await bcrypt.hash(password, await bcrypt.genSalt());
     const user: User = {
         username: username.toLowerCase(),
         displayname: username,
-        uuid: id,
-        password
+        uuid,
+        password: hash
     }
 
-    a.set(['users_by_id', id], user);
-    a.set(['users_by_username'], user.username);
+    a.set(['users_by_uuid', uuid], user);
+    a.set(['users_by_username', user.username], user);
 
     await a.commit();
+
+    return uuid;
 }
