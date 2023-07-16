@@ -25,7 +25,7 @@ async function doesUsernameExist(username: string) {
 }
 
 async function createUser(username: string, password: string) {
-    const a = await kv.atomic();
+    const a = kv.atomic();
     const uuid = crypto.randomUUID();
     const hash = await bcrypt.hash(password, await bcrypt.genSalt());
     const user: User = {

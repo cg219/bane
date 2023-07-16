@@ -1,9 +1,14 @@
 {
   "tasks": {
-    "dev": "deno run -A --unstable --watch main.ts"
+    "dev": "deno run -A --unstable --watch main.ts",
   },
   "imports": {
     "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
     "jsonwebtoken": "npm:jsonwebtoken"
+  },
+  "test": {
+    "include": [
+      "tests/*.ts"
+    ]
   }
 }
