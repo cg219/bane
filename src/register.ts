@@ -1,6 +1,6 @@
 import { User } from "../types.d.ts";
 import * as bcrypt from "bcrypt";
-import session, { createSession } from "./session.ts";
+import { createSession } from "./session.ts";
 import { createTokens } from "./token.ts";
 
 const kv = await Deno.openKv();
