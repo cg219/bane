@@ -1,13 +1,12 @@
-import { register } from "../main.ts";
+import "https://deno.land/std@0.194.0/dotenv/load.ts";
 import { assertExists, assertEquals } from "https://deno.land/std@0.194.0/testing/asserts.ts";
-import { User } from "../types.d.ts";
+import { USERS, User } from "../src/types.ts";
 import * as bcrypt from "bcrypt";
+import { register } from "../src/register.ts";
 
-const kv = await Deno.openKv('db/testdb');
+const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
 
 Deno.test('registration', async (t) => {
-    const USERS_BY_NAME = 'users_by_username';
-    const USERS_BY_ID = 'users_by_uuid'
     const username = 'TestUser';
     const password = 'zzCwHb4nddah665fRJ87';
     const user = await register(username, password);
@@ -21,17 +20,17 @@ Deno.test('registration', async (t) => {
     })
 
     await t.step('is the username correct?', async () => {
-        const u = await kv.get<User>([USERS_BY_NAME, username.toLowerCase()]);
+        const u = await kv.get<User>([USERS.NAME, username.toLowerCase()]);
 
-        if (!u.value) return;
+        if (!u.value) throw new Error();
 
-        assertEquals(u.value.username, username.toString());
+        assertEquals(u.value.username, username.toLowerCase());
     })
 
     await t.step('is the password correct?', async () => {
-        const u = await kv.get<User>([USERS_BY_NAME, username.toLowerCase()]);
+        const u = await kv.get<User>([USERS.NAME, username.toLowerCase()]);
 
-        if (!u.value) return;
+        if (!u.value) throw new Error();
 
         const m = await bcrypt.compare(password, u.value.password);
 
@@ -39,21 +38,21 @@ Deno.test('registration', async (t) => {
     })
 
     await t.step('is user matchtching in indexes', async () => {
-        const u1 = await kv.get<User>([USERS_BY_NAME, username.toLowerCase()]);
+        const u1 = await kv.get<User>([USERS.NAME, username.toLowerCase()]);
 
-        if (!u1.value) return;
+        if (!u1.value) throw new Error();
 
-        const u2 = await kv.get<User>([USERS_BY_ID, u1.value.uuid]);
+        const u2 = await kv.get<User>([USERS.ID, u1.value.uuid]);
 
-        if (!u2.value) return;
+        if (!u2.value) throw new Error();
 
         assertEquals(JSON.stringify(u1.value), JSON.stringify(u2.value));
     })
 
-    const u = await kv.get<User>([USERS_BY_NAME, username.toLowerCase()]);
+    const u = await kv.get<User>([USERS.NAME, username.toLowerCase()]);
 
-    if (!u.value) return;
-
-    await kv.delete([USERS_BY_NAME, u.value.username]);
-    await kv.delete([USERS_BY_ID, u.value.uuid]);
+    if (u.value) {
+        await kv.delete([USERS.NAME, u.value.username]);
+        await kv.delete([USERS.ID, u.value.uuid]);
+    }
 })

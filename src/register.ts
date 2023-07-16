@@ -1,9 +1,9 @@
-import { User } from "../types.d.ts";
-import * as bcrypt from "bcrypt";
+import { USERS } from "./types.ts";
 import { createSession } from "./session.ts";
 import { createTokens } from "./token.ts";
+import { createUser, removeUser } from "./user.ts";
 
-const kv = await Deno.openKv();
+const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
 
 export default { register };
 
@@ -12,33 +12,22 @@ export async function register(username: string, password: string) {
 
     if (!userExists) throw new Error('Username already exists');
 
-    const userid = await createUser(username, password);
+    const userid = await createUser({ username, password });
     const sessionToken = await createSession(userid);
 
     return createTokens(sessionToken.uuid, userid);
 }
 
-async function doesUsernameExist(username: string) {
-    const user = await kv.get(['users_by_username', username]);
+export async function unregister(username: string, password: string) {
+    const userExists = await doesUsernameExist(username);
 
-    return user ? true : false;
+    if (!userExists) throw new Error('User not found');
+
+    await removeUser({ username, password });
 }
 
-async function createUser(username: string, password: string) {
-    const a = kv.atomic();
-    const uuid = crypto.randomUUID();
-    const hash = await bcrypt.hash(password, await bcrypt.genSalt());
-    const user: User = {
-        username: username.toLowerCase(),
-        displayname: username,
-        uuid,
-        password: hash
-    }
+async function doesUsernameExist(username: string) {
+    const user = await kv.get([USERS.NAME, username]);
 
-    a.set(['users_by_uuid', uuid], user);
-    a.set(['users_by_username', user.username], user);
-
-    await a.commit();
-
-    return uuid;
+    return user ? true : false;
 }
