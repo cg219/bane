@@ -1,10 +1,6 @@
-import { User } from "./types.ts";
-import * as bcrypt from "bcrypt";
 import { createTokens } from "./token.ts";
 import { createSession } from "./session.ts";
 import { getUser } from "./user.ts";
-
-const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
 
 export default { login }
 

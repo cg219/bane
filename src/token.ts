@@ -2,7 +2,7 @@ import * as jwt from "jsonwebtoken";
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET') ?? 'secret';
 
-export default { createRefreshToken, createAccessToken, createTokens }
+export default { createRefreshToken, createAccessToken, createTokens, decodeToken }
 
 export function createRefreshToken(sessionUUID: string) {
     try {
@@ -21,4 +21,8 @@ export function createTokens(sessionUUID: string, userID: string) {
         accessToken: createAccessToken(sessionUUID, userID),
         refreshToken: createRefreshToken(sessionUUID)
     }
+}
+
+export function decodeToken(token: string) {
+    return jwt.verify(token, JWT_SECRET);
 }

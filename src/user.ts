@@ -1,4 +1,4 @@
-import { removeSession, removeUserSessions } from "./session.ts";
+import { removeUserSessions } from "./session.ts";
 import { USERS, User, UserPassData } from "./types.ts";
 import * as bcrypt from "bcrypt";
 

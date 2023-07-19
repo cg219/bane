@@ -1,7 +1,6 @@
 import "https://deno.land/std@0.194.0/dotenv/load.ts";
-import { assertExists, assertEquals, assertNotEquals } from "https://deno.land/std@0.194.0/testing/asserts.ts";
+import { assertExists, assertEquals } from "https://deno.land/std@0.194.0/testing/asserts.ts";
 import { SESSIONS, Session } from "../src/types.ts";
-import * as bcrypt from "bcrypt";
 import { createSession, getSession, grantSession, removeSession, revokeSession } from "../src/session.ts";
 
 const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
