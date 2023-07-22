@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { getSession } from "./session.ts";
+import { Session } from "./types.ts";
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET') ?? 'secret';
 
@@ -33,9 +34,9 @@ export async function refreshTokens(refreshToken: string) {
             return createTokens(session.uuid, session.userid);
         }
 
-    } catch(_) { }
+    } catch(error) { console.error(error) }
 }
 
-export function decodeToken(token: string) {
+export function decodeToken(token: string): Session {
     return jwt.verify(token, JWT_SECRET);
 }

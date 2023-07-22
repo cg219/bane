@@ -6,26 +6,26 @@ const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
 
 export default { getUser, removeUser, createUser }
 
-export async function createUser({ username, password }: UserPassData) {
+export async function createUser({ email, password }: UserPassData) {
     const uuid = crypto.randomUUID();
     const hash = await bcrypt.hash(password, await bcrypt.genSalt());
     const user: User = {
-        username: username.toLowerCase(),
-        displayname: username,
+        email: email.toLowerCase(),
+        displayname: email,
         uuid,
         password: hash
     }
 
     await kv.atomic()
         .set([USERS.ID, uuid], user)
-        .set([USERS.NAME, user.username], user)
+        .set([USERS.EMAIL, user.email], user)
         .commit();
 
     return uuid;
 }
 
-export async function getUser({ username, password }: UserPassData) {
-    const user = await kv.get<User>([USERS.NAME, username.toLowerCase()]);
+export async function getUser({ email, password }: UserPassData) {
+    const user = await kv.get<User>([USERS.EMAIL, email.toLowerCase()]);
 
     if (!user.value) throw new Error('User not found');
 
@@ -36,12 +36,12 @@ export async function getUser({ username, password }: UserPassData) {
     return user.value;
 }
 
-export async function removeUser({ username, password }: UserPassData) {
-    const user = await getUser({ username, password });
+export async function removeUser({ email, password }: UserPassData) {
+    const user = await getUser({ email, password });
 
     await kv.atomic()
         .delete([USERS.ID, user.uuid])
-        .delete([USERS.NAME, user.username])
+        .delete([USERS.EMAIL, user.email])
         .commit();
 
     await removeUserSessions(user.uuid);
