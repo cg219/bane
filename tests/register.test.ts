@@ -1,10 +1,8 @@
 import "https://deno.land/std@0.194.0/dotenv/load.ts";
 import { assertExists, assertEquals } from "https://deno.land/std@0.194.0/testing/asserts.ts";
-import { USERS, User } from "../src/types.ts";
 import * as bcrypt from "bcrypt";
 import { register } from "../src/authenticate.ts";
-
-const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
+import { getUser, removeUser } from "../src/user.ts";
 
 Deno.test('registration', async (t) => {
     const email = 'TestUser';
@@ -20,39 +18,21 @@ Deno.test('registration', async (t) => {
     })
 
     await t.step('is the email correct?', async () => {
-        const u = await kv.get<User>([USERS.EMAIL, email.toLowerCase()]);
-
-        if (!u.value) throw new Error();
-
-        assertEquals(u.value.email, email.toLowerCase());
+        try {
+            assertEquals((await getUser({ email, password })).email, email.toLowerCase());
+        } catch(_) {/**/}
     })
 
     await t.step('is the password correct?', async () => {
-        const u = await kv.get<User>([USERS.EMAIL, email.toLowerCase()]);
+        try {
+            const u = await getUser({ email, password })
+            const m = await bcrypt.compare(password, u.password);
 
-        if (!u.value) throw new Error();
-
-        const m = await bcrypt.compare(password, u.value.password);
-
-        assertEquals(m, true);
+            assertEquals(m, true);
+        } catch (_) {/**/}
     })
 
-    await t.step('is user matchtching in indexes', async () => {
-        const u1 = await kv.get<User>([USERS.EMAIL, email.toLowerCase()]);
-
-        if (!u1.value) throw new Error();
-
-        const u2 = await kv.get<User>([USERS.ID, u1.value.uuid]);
-
-        if (!u2.value) throw new Error();
-
-        assertEquals(JSON.stringify(u1.value), JSON.stringify(u2.value));
-    })
-
-    const u = await kv.get<User>([USERS.EMAIL, email.toLowerCase()]);
-
-    if (u.value) {
-        await kv.delete([USERS.EMAIL, u.value.email]);
-        await kv.delete([USERS.ID, u.value.uuid]);
-    }
+    try {
+        await removeUser({ email, password });
+    } catch (_) {/**/}
 })

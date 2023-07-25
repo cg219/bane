@@ -1,10 +1,8 @@
 import { createTokens } from "./token.ts";
 import { createSession } from "./session.ts";
 import { getUser } from "./user.ts";
-import { USERS } from "./types.ts";
 import { createUser, removeUser } from "./user.ts";
-
-const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
+import { users } from "./models.ts";
 
 export default { login, register, unregister }
 
@@ -38,7 +36,10 @@ export async function login(email: string, password: string) {
 }
 
 async function doesUserExist(email: string) {
-    const user = await kv.get([USERS.EMAIL, email]);
+    try { await users().index('email').get(email) }
+    catch(_) {
+        return true;
+    }
 
-    return user ? true : false;
+    return false;
 }

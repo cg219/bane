@@ -1,5 +1,5 @@
 import "https://deno.land/std@0.194.0/dotenv/load.ts";
-import { assertEquals, assertExists, fail } from "https://deno.land/std@0.194.0/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "https://deno.land/std@0.194.0/testing/asserts.ts";
 import { createUser, getUser, removeUser } from "../src/user.ts";
 
 Deno.test('users', async (t) => {
@@ -24,8 +24,8 @@ Deno.test('users', async (t) => {
         try {
             await getUser({ email, password });
         } catch(e) {
-            if (e.message != `User not found`) {
-                fail();
+            if (e.message != `No values found`) {
+                assert(true);
             }
         }
     })

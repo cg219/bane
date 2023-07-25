@@ -3,6 +3,7 @@ export type User = {
     email: string;
     displayname: string;
     password: string;
+    [key: string]: string;
 }
 
 export type Session = {
@@ -16,14 +17,4 @@ export type Session = {
 export type UserPassData = {
     email: string;
     password: string;
-}
-
-export enum USERS {
-    ID = 'users_by_uuid',
-    EMAIL = 'users_by_email'
-}
-
-export enum SESSIONS {
-    ID = 'sessions_by_id',
-    USER = 'sessions_by_userid'
 }
