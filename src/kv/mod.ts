@@ -1,4 +1,4 @@
-interface KvDbSchemaInterface<T> {
+type KvDbSchemaInterface<T> = {
     name(value: string): KvDbSchema<T>
     primary(name: string): KvDbSchema<T>
     secondary(name: string): KvDbSchema<T>
@@ -6,7 +6,7 @@ interface KvDbSchemaInterface<T> {
     kv: Deno.Kv
 }
 
-interface KvDbModelInterface<T> {
+type KvDbModelInterface<T> = {
     index(value: string): KvDbModel<T>
     get(value: string, index?: string): Promise<T | T[]>
     save(value: T): void

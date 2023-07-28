@@ -13,6 +13,7 @@ export async function createUser({ email, password }: UserPassData) {
         displayname: email,
         uuid,
         password: hash
+        verified: false
     }
 
     await users().save(user);
@@ -36,4 +37,10 @@ export async function removeUser({ email, password }: UserPassData) {
     try {
         await removeUserSessions(user.uuid);
     } catch (_) { /**/ }
+}
+
+export async function updateUser({ email: string, password: string, newUser: User }) {
+    const user = await getUser({ email, password });
+
+    await users().save(newUser);
 }
