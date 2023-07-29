@@ -1,6 +1,5 @@
 import * as jwt from "jsonwebtoken";
-import { getSession } from "./session.ts";
-import { Session } from "./types.ts";
+import { Session, getSession } from "./session.ts";
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET') ?? 'secret';
 

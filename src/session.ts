@@ -1,7 +1,14 @@
 import { sessions } from "./models.ts";
-import { Session } from "./types.ts";
 
 export default { createSession, getSession, revokeSession, grantSession, removeSession }
+
+export type Session = {
+    uuid: string;
+    userid: string;
+    valid: boolean;
+    updated: string;
+    created: string;
+}
 
 export async function createSession(userid: string) {
     const uuid = crypto.randomUUID();

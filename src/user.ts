@@ -1,9 +1,22 @@
 import { users } from "./models.ts";
 import { removeUserSessions } from "./session.ts";
-import { User, UserPassData } from "./types.ts";
 import * as bcrypt from "bcrypt";
 
 export default { getUser, removeUser, createUser }
+
+export type User = {
+    uuid: string;
+    email: string;
+    displayname: string;
+    password: string;
+    [key: string]: string | boolean;
+    verified: boolean;
+}
+
+export type UserPassData = {
+    email: string;
+    password: string;
+}
 
 export async function createUser({ email, password }: UserPassData) {
     const uuid = crypto.randomUUID();
@@ -11,9 +24,9 @@ export async function createUser({ email, password }: UserPassData) {
     const user: User = {
         email: email.toLowerCase(),
         displayname: email,
-        uuid,
-        password: hash
-        verified: false
+        password: hash,
+        verified: false,
+        uuid
     }
 
     await users().save(user);
@@ -39,8 +52,7 @@ export async function removeUser({ email, password }: UserPassData) {
     } catch (_) { /**/ }
 }
 
-export async function updateUser({ email: string, password: string, newUser: User }) {
-    const user = await getUser({ email, password });
-
+export async function updateUser({ email, password, newUser }: { email: string, password: string, newUser: User }) {
+    await getUser({ email, password });
     await users().save(newUser);
 }

@@ -1,5 +1,6 @@
 import { kvdb } from "./kv/mod.ts"
-import { Session, User } from "./types.ts";
+import { Session } from "./session.ts";
+import { User } from "./user.ts";
 
 const kv = await Deno.openKv(Deno.env.get('TEST_DB'));
 

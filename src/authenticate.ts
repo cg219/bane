@@ -1,7 +1,6 @@
 import { createTokens } from "./token.ts";
 import { createSession } from "./session.ts";
-import { getUser } from "./user.ts";
-import { createUser, removeUser } from "./user.ts";
+import { getUser, createUser, removeUser } from "./user.ts";
 import { users } from "./models.ts";
 
 export default { login, register, unregister }
